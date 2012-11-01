@@ -22,6 +22,21 @@ STD= -std=c99 -pedantic
 WARN= -Wall
 OPT= $(OPTIMIZATION)
 
+ifeq ($(uname_S),SunOS)
+  R_CFLAGS= $(STD) $(WARN) $(OPT) $(DEBUG) $(CFLAGS) -D__EXTENSIONS__ -D_XPG6
+  R_LDFLAGS= $(LDFLAGS)
+  R_LIBS= $(LIBS) -ldl -lnsl -lsocket -lm -lpthread
+  DEBUG= -g -ggdb
+else
+  R_CFLAGS= $(STD) $(WARN) $(OPT) $(DEBUG) $(CFLAGS)
+  R_LDFLAGS= $(LDFLAGS)
+  R_LIBS= $(LIBS) -lm -pthread
+  DEBUG= -g -rdynamic -ggdb
+endif
+
+# Include paths to dependencies
+R_CFLAGS+= -I../deps/hiredis -I../deps/linenoise -I../deps/lua/src
+
 # Default allocator
 ifeq ($(uname_S),Linux)
   MALLOC=jemalloc
